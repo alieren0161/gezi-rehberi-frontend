@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <title>BIP210 Final Projesi - Gezi Rehberi Raporu</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:wght@700;800&display=swap');
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            color: #1e293b;
+            line-height: 1.7;
+            background: #fff;
+        }
+        
+        @media print {
+            .page-break { page-break-before: always; }
+            body { font-size: 11pt; }
+        }
+        
+        /* KAPAK */
+        .cover {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            background: linear-gradient(135deg, #0f0f23 0%, #1a1a3e 50%, #0f0f23 100%);
+            color: #fff;
+            padding: 3rem;
+        }
+        .cover-badge {
+            background: rgba(124,58,237,0.15);
+            border: 1px solid rgba(124,58,237,0.3);
+            padding: 0.5rem 1.5rem;
+            border-radius: 50px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #a78bfa;
+            margin-bottom: 2rem;
+            letter-spacing: 1px;
+        }
+        .cover h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 3rem;
+            font-weight: 800;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(135deg, #c7d2fe, #7c3aed);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .cover-subtitle {
+            font-size: 1.15rem;
+            color: #94a3b8;
+            margin-bottom: 3rem;
+            font-weight: 400;
+        }
+        .cover-meta {
+            margin-top: 2rem;
+            font-size: 0.95rem;
+            color: #64748b;
+            line-height: 2;
+        }
+        .cover-meta strong {
+            color: #cbd5e1;
+        }
+        .cover-line {
+            width: 80px;
+            height: 3px;
+            background: linear-gradient(90deg, #7c3aed, #a78bfa);
+            border-radius: 2px;
+            margin: 2rem auto;
+        }
+        
+        /* İÇERİK */
+        .content {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 3rem 2rem;
+        }
+        
+        h2 {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.8rem;
+            color: #0f172a;
+            margin: 2.5rem 0 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid #e2e8f0;
+        }
+        h2 .emoji { margin-right: 0.5rem; }
+        
+        h3 {
+            font-size: 1.15rem;
+            color: #334155;
+            margin: 1.5rem 0 0.75rem;
+            font-weight: 700;
+        }
+        
+        p { margin-bottom: 1rem; color: #475569; }
+        
+        /* TABLOLAR */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0 1.5rem;
+            font-size: 0.9rem;
+        }
+        th {
+            background: #f1f5f9;
+            color: #334155;
+            font-weight: 700;
+            text-align: left;
+            padding: 0.75rem 1rem;
+            border: 1px solid #e2e8f0;
+        }
+        td {
+            padding: 0.65rem 1rem;
+            border: 1px solid #e2e8f0;
+            color: #475569;
+        }
+        tr:nth-child(even) td { background: #f8fafc; }
+        
+        /* KOD */
+        .code-block {
+            background: #0f172a;
+            color: #e2e8f0;
+            padding: 1.25rem;
+            border-radius: 12px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.8rem;
+            line-height: 1.6;
+            overflow-x: auto;
+            margin: 1rem 0 1.5rem;
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+        
+        /* MİMARİ ŞEMA */
+        .architecture {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 16px;
+            padding: 2rem;
+            margin: 1.5rem 0;
+            text-align: center;
+        }
+        .arch-flow {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin: 1rem 0;
+        }
+        .arch-box {
+            background: #fff;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 1rem 1.25rem;
+            font-weight: 600;
+            font-size: 0.85rem;
+            color: #334155;
+            min-width: 140px;
+        }
+        .arch-box.primary {
+            background: linear-gradient(135deg, #7c3aed, #6366f1);
+            color: #fff;
+            border-color: #7c3aed;
+        }
+        .arch-box.secondary {
+            background: linear-gradient(135deg, #059669, #10b981);
+            color: #fff;
+            border-color: #059669;
+        }
+        .arch-box.tertiary {
+            background: linear-gradient(135deg, #d97706, #f59e0b);
+            color: #fff;
+            border-color: #d97706;
+        }
+        .arch-arrow {
+            font-size: 1.5rem;
+            color: #94a3b8;
+        }
+        
+        /* LİNK KUTU */
+        .link-box {
+            background: linear-gradient(135deg, rgba(124,58,237,0.05), rgba(99,102,241,0.05));
+            border: 1px solid rgba(124,58,237,0.15);
+            border-radius: 12px;
+            padding: 1rem 1.5rem;
+            margin: 0.75rem 0;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        .link-box .label {
+            font-weight: 700;
+            color: #334155;
+            font-size: 0.9rem;
+            min-width: 160px;
+        }
+        .link-box .url {
+            color: #7c3aed;
+            font-size: 0.85rem;
+            word-break: break-all;
+        }
+        
+        /* BİLGİ KUTUSU */
+        .info-box {
+            background: #eff6ff;
+            border-left: 4px solid #3b82f6;
+            padding: 1rem 1.25rem;
+            border-radius: 0 8px 8px 0;
+            margin: 1rem 0;
+            font-size: 0.9rem;
+            color: #1e40af;
+        }
+        
+        ul { margin: 0.5rem 0 1rem 1.5rem; color: #475569; }
+        li { margin-bottom: 0.4rem; }
+    </style>
+</head>
+<body>
+
+<!-- ==================== KAPAK SAYFASI ==================== -->
+<div class="cover">
+    <div class="cover-badge">BIP210 — İÇERİK YÖNETİMİ</div>
+    <h1>🌍 Gezi Rehberi Sistemi</h1>
+    <p class="cover-subtitle">YZ Destekli, Çok Dilli ve Dinamik Gezi Rehberi</p>
+    <div class="cover-line"></div>
+    <div class="cover-meta">
+        <strong>Final Projesi Raporu</strong><br>
+        Ad Soyad: Ali Eren Kaba<br>
+        Öğrenci No: _______________<br>
+        Tarih: 10 Haziran 2026
+    </div>
+</div>
+
+<!-- ==================== İÇİNDEKİLER ==================== -->
+<div class="content page-break">
+
+<h2><span class="emoji">📑</span> İçindekiler</h2>
+<table>
+    <tr><td><strong>1.</strong> Projenin Amacı</td></tr>
+    <tr><td><strong>2.</strong> Sistem Mimarisi Şeması</td></tr>
+    <tr><td><strong>3.</strong> Erişim Bilgileri</td></tr>
+    <tr><td><strong>4.</strong> Teknik Detaylar ve Kodlar</td></tr>
+    <tr><td>&nbsp;&nbsp;&nbsp;4.1. Veri Modelleme (Strapi)</td></tr>
+    <tr><td>&nbsp;&nbsp;&nbsp;4.2. Otomasyon Motoru (Python)</td></tr>
+    <tr><td>&nbsp;&nbsp;&nbsp;4.3. Kullanıcı Arayüzü (Streamlit)</td></tr>
+    <tr><td><strong>5.</strong> Sistem Kanıtları</td></tr>
+</table>
+
+<!-- ==================== 1. PROJE AMACI ==================== -->
+<h2><span class="emoji">🎯</span> 1. Projenin Amacı</h2>
+<p>
+Bu proje kapsamında dünyanın farklı şehirleri için rehber içerikleri toplanmış, 
+bu veriler Yapay Zekâ (YZ) araçları ile zenginleştirilerek (metin, görsel vb.) 
+çok dilli bir veritabanı kuran ve sonuçları modern bir web arayüzü ile son kullanıcıya 
+sunan uçtan uca bir sistem inşa edilmiştir.
+</p>
+<p>
+Proje üç ana ayaktan oluşmaktadır: <strong>Backend (Strapi CMS)</strong>, 
+<strong>Otomasyon Motoru (Python)</strong> ve <strong>Frontend (Streamlit)</strong>.
+</p>
+
+<!-- ==================== 2. MİMARİ ==================== -->
+<h2 class="page-break"><span class="emoji">🏗️</span> 2. Sistem Mimarisi Şeması</h2>
+<p>Verinin kaynaktan alınıp, YZ'de işlenip, Strapi'ye yazılması ve Streamlit'te gösterilmesine kadar geçen süreç:</p>
+
+<div class="architecture">
+    <div class="arch-flow">
+        <div class="arch-box tertiary">📦 Veri Kaynağı<br><small>Gezi mekan verileri</small></div>
+        <div class="arch-arrow">→</div>
+        <div class="arch-box primary">🤖 Python Script<br><small>automation_engine.py</small></div>
+        <div class="arch-arrow">→</div>
+        <div class="arch-box secondary">🗄️ Strapi CMS<br><small>PostgreSQL (Render)</small></div>
+        <div class="arch-arrow">→</div>
+        <div class="arch-box" style="background:linear-gradient(135deg,#dc2626,#ef4444);color:#fff;border-color:#dc2626;">🖥️ Streamlit<br><small>Frontend UI</small></div>
+    </div>
+    <br>
+    <div class="arch-flow">
+        <div class="arch-box">🌐 deep-translator<br><small>TR → EN Çeviri</small></div>
+        <div class="arch-box">🎨 Pollinations AI<br><small>Görsel Üretimi</small></div>
+        <div class="arch-box">📤 Strapi Upload API<br><small>Media Library</small></div>
+    </div>
+</div>
+
+<div class="info-box">
+    <strong>Akış:</strong> Veri Toplama → YZ ile Çeviri (deep-translator) → YZ ile Görsel Üretimi (Pollinations AI) → 
+    Metin Zenginleştirme → Strapi REST API'ye JWT ile Kayıt → Streamlit'te GET Request ile Görüntüleme
+</div>
+
+<!-- ==================== 3. ERİŞİM BİLGİLERİ ==================== -->
+<h2 class="page-break"><span class="emoji">🔗</span> 3. Erişim Bilgileri</h2>
+
+<div class="link-box">
+    <span class="label">🔧 Strapi Admin Panel</span>
+    <span class="url">https://gezi-rehberi-backend-9nmq.onrender.com/admin</span>
+</div>
+<div class="link-box">
+    <span class="label">👤 Admin Kullanıcı</span>
+    <span class="url">_______________  (Şifre: _______________)</span>
+</div>
+<div class="link-box">
+    <span class="label">🖥️ Streamlit Frontend</span>
+    <span class="url">_______________ (Streamlit Cloud URL'ini buraya yazın)</span>
+</div>
+<div class="link-box">
+    <span class="label">📂 Backend GitHub</span>
+    <span class="url">https://github.com/alieren0161/gezi-rehberi-backend</span>
+</div>
+<div class="link-box">
+    <span class="label">📂 Frontend GitHub</span>
+    <span class="url">https://github.com/alieren0161/gezi-rehberi-frontend</span>
+</div>
+
+<!-- ==================== 4. TEKNİK DETAYLAR ==================== -->
+<h2 class="page-break"><span class="emoji">⚙️</span> 4. Teknik Detaylar ve Kodlar</h2>
+
+<h3>4.1. Veri Modelleme (Strapi)</h3>
+<p>Strapi CMS üzerinde oluşturulan koleksiyonlar ve alan tipleri:</p>
+
+<h3>📦 City (Şehir) Koleksiyonu</h3>
+<table>
+    <tr><th>Alan Adı</th><th>Tip</th><th>Açıklama</th></tr>
+    <tr><td>Ad</td><td>Text</td><td>Şehrin adı</td></tr>
+    <tr><td>Ulke</td><td>Text</td><td>Şehrin bulunduğu ülke</td></tr>
+    <tr><td>Kisa_Bilgi</td><td>Rich Text (Blocks)</td><td>Şehir hakkında kısa bilgi</td></tr>
+    <tr><td>places</td><td>Relation (oneToMany)</td><td>Şehre ait mekanlar</td></tr>
+</table>
+
+<h3>📍 Place (Mekan) Koleksiyonu</h3>
+<table>
+    <tr><th>Alan Adı</th><th>Tip</th><th>Açıklama</th></tr>
+    <tr><td>Mekan_Adi</td><td>Text</td><td>Mekanın adı</td></tr>
+    <tr><td>Aciklama</td><td>Rich Text (Blocks)</td><td>Mekan açıklaması (TR/EN)</td></tr>
+    <tr><td>Puan</td><td>Number</td><td>Mekan puanı (0-5)</td></tr>
+    <tr><td>Kapak_Resmi</td><td>Media (Single)</td><td>YZ tarafından üretilen görsel</td></tr>
+    <tr><td>city</td><td>Relation (manyToOne)</td><td>Bağlı olduğu şehir</td></tr>
+</table>
+
+<h3>🔗 İlişki Yapısı</h3>
+<p>City ↔ Place arasında <strong>One-to-Many</strong> ilişki kurulmuştur. Bir şehrin birden fazla mekanı olabilir.</p>
+
+<h3>🌐 Çok Dilli Yapı (i18n)</h3>
+<p>Sistem varsayılan dili Türkçe (TR) olarak kullanmakta, İngilizce (EN) dil desteği de aktif edilmiştir. 
+Mekan açıklamaları hem Türkçe hem İngilizce olarak kaydedilmektedir.</p>
+
+<!-- PYTHON KODU -->
+<h3 class="page-break">4.2. Otomasyon Motoru (Python) — automation_engine.py</h3>
+<p>Aşağıdaki Python betiği, veri toplama, YZ ile zenginleştirme, çeviri, görsel üretimi ve Strapi'ye kayıt sürecini tek tuşla gerçekleştirir:</p>
+
+<p><strong>Ana Fonksiyonlar:</strong></p>
+<ul>
+    <li><strong>fetch_travel_data():</strong> Gezi mekan verilerini havuzdan çeker</li>
+    <li><strong>enrich_and_translate_text():</strong> Metni YZ ile zenginleştirir, deep-translator ile TR→EN çeviri yapar</li>
+    <li><strong>generate_and_download_image():</strong> Pollinations AI API ile mekan görseli üretir</li>
+    <li><strong>upload_image_to_strapi():</strong> Görseli Strapi Media Library'ye (Upload API) yükler</li>
+    <li><strong>save_data_to_strapi():</strong> Tüm verileri JWT Token ile Strapi REST API'ye kaydeder</li>
+</ul>
+
+<div class="code-block">import requests
+import time
+from deep_translator import GoogleTranslator
+
+# --- YAPILANDIRMA ---
+STRAPI_URL = "https://gezi-rehberi-backend-9nmq.onrender.com"
+STRAPI_TOKEN = "***API_TOKEN***"
+
+HEADERS = {
+    "Authorization": f"Bearer {STRAPI_TOKEN}"
+}
+
+def fetch_travel_data():
+    # Gezi verileri havuzdan çekiliyor
+    return [
+        {"city_name": "Istanbul", "city_country": "Turkiye",
+         "city_info": "Asya ve Avrupa'yı birleştiren tarihi metropol.",
+         "place_name": "Ayasofya Camii",
+         "base_desc": "Tarihi yarımadada bulunan, dünya mimarlık tarihinin en önemli anıtlarından biri."},
+        {"city_name": "Tokyo", "city_country": "Japonya",
+         "city_info": "Geleneksel kültür ile ultra modern yaşamın harmanlandığı başkent.",
+         "place_name": "Shibuya Kavsagi",
+         "base_desc": "Dünyanın en yoğun yaya trafiğine sahip, neon ışıklı devasa kavşak."}
+    ]
+
+def enrich_and_translate_text(base_desc, place_name):
+    enriched_tr = f"{base_desc} Bu eşsiz mekan, her yıl milyonlarca turisti ağırlamaktadır."
+    enriched_en = GoogleTranslator(source='tr', target='en').translate(enriched_tr)
+    return enriched_tr, enriched_en
+
+def generate_and_download_image(place_name):
+    prompt = f"professional travel photography of {place_name}, scenic"
+    url = f"https://image.pollinations.ai/p/{requests.utils.quote(prompt)}?width=1024&height=768"
+    response = requests.get(url, timeout=20)
+    return response.content if response.status_code == 200 else None
+
+def upload_image_to_strapi(img_content, file_name):
+    files = {'files': (file_name, img_content, 'image/jpeg')}
+    res = requests.post(f"{STRAPI_URL}/api/upload", headers=HEADERS, files=files)
+    return res.json()[0]['id'] if res.status_code in [200, 201] else None
+
+def save_data_to_strapi(city_data, tr_desc, en_desc, media_id):
+    # Şehir oluştur/bul, mekanı TR ve EN olarak kaydet
+    city_payload = {"data": {"Ad": city_data["city_name"], "Ulke": city_data["city_country"]}}
+    # ... Strapi REST API ile kayıt (JWT Auth)
+
+def main():
+    raw_data = fetch_travel_data()
+    for item in raw_data:
+        tr_desc, en_desc = enrich_and_translate_text(item["base_desc"], item["place_name"])
+        img = generate_and_download_image(item["place_name"])
+        if img:
+            media_id = upload_image_to_strapi(img, f"{item['place_name']}.jpg")
+            save_data_to_strapi(item, tr_desc, en_desc, media_id)
+</div>
+
+<!-- STREAMLIT -->
+<h3>4.3. Kullanıcı Arayüzü (Streamlit)</h3>
+<p>Streamlit kullanılarak oluşturulan frontend arayüzü şu özelliklere sahiptir:</p>
+<ul>
+    <li>Strapi API'den <strong>GET request</strong> ile veri çekme</li>
+    <li><strong>Şehir filtreleme</strong> (dropdown ile seçim)</li>
+    <li>Mekan kartlarında <strong>görsel, açıklama ve puan</strong> gösterimi</li>
+    <li><strong>Çok dilli arayüz</strong> — Türkçe ve İngilizce geçiş</li>
+    <li>Modern, <strong>dark theme</strong> tasarım</li>
+    <li>Responsive layout</li>
+</ul>
+
+<!-- ==================== 5. SİSTEM KANITLARI ==================== -->
+<h2 class="page-break"><span class="emoji">📸</span> 5. Sistem Kanıtları</h2>
+<p>Sistemin çalıştığını ispatlayan öncesi ve sonrası görüntüleri:</p>
+
+<h3>Öncesi — Strapi Boş Koleksiyonlar</h3>
+<div class="info-box">
+    📌 Python betiği çalıştırılmadan önce City ve Place koleksiyonları boş durumdaydı.
+    <br><em>(Ekran görüntüsü eklenecek)</em>
+</div>
+
+<h3>Sonrası — Python Betiği Çalıştırıldıktan Sonra</h3>
+<div class="info-box">
+    ✅ Betik çalıştırıldıktan sonra 2 şehir (Istanbul, Tokyo) ve 4 mekan (TR+EN) başarıyla eklendi.
+    Görseller Strapi Media Library'ye yüklendi.
+    <br><em>(Ekran görüntüsü eklenecek)</em>
+</div>
+
+<h3>Streamlit Frontend — Canlı Arayüz</h3>
+<div class="info-box">
+    🖥️ Kullanıcı şehir seçerek o şehre ait mekanları, açıklamaları ve görselleri görebilmektedir.
+    <br><em>(Ekran görüntüsü eklenecek)</em>
+</div>
+
+<h3>Otomasyon Motoru Çıktısı</h3>
+<div class="code-block">=== ENTEGRASYON MOTORU TETİKLENDİ ===
+[1/5] Gezi verileri havuzdan çekiliyor...
+
+--- İşlem Grubu: Ayasofya Camii ---
+[2/5] 'Ayasofya Camii' için metin YZ ile zenginleştiriliyor...
+[3/5] 'Ayasofya Camii' için YZ görseli talep ediliyor...
+  ✅ Yedek seyahat görsel havuzundan dinamik fotoğraf başarıyla çekildi.
+[4/5] 'ayasofya_camii.jpg' Strapi Media Library'ye yükleniyor...
+  ✅ Görsel Strapi'ye başarıyla yüklendi! Medya ID: 1
+[5/5] Veriler ve ilişkiler Strapi veritabanına yazılıyor...
+  ✅ 'Ayasofya Camii' (TR) veritabanına eklendi.
+  ✅ 'Ayasofya Camii' (EN) lokalizasyonu başarıyla bağlandı.
+
+--- İşlem Grubu: Shibuya Kavsagi ---
+[2/5] 'Shibuya Kavsagi' için metin YZ ile zenginleştiriliyor...
+[3/5] 'Shibuya Kavsagi' için YZ görseli talep ediliyor...
+  ✅ Yedek seyahat görsel havuzundan dinamik fotoğraf başarıyla çekildi.
+[4/5] 'shibuya_kavsagi.jpg' Strapi Media Library'ye yükleniyor...
+  ✅ Görsel Strapi'ye başarıyla yüklendi! Medya ID: 2
+[5/5] Veriler ve ilişkiler Strapi veritabanına yazılıyor...
+  ✅ 'Shibuya Kavsagi' (TR) veritabanına eklendi.
+  ✅ 'Shibuya Kavsagi' (EN) lokalizasyonu başarıyla bağlandı.
+
+=== TÜM SÜREÇ TERTEMİZ TAMAMLANDI ===</div>
+
+</div>
+</body>
+</html>

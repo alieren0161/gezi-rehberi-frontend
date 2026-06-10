@@ -2,7 +2,6 @@ import requests
 import time
 from deep_translator import GoogleTranslator
 
-# --- YAPILANDIRMA ---
 STRAPI_URL = "https://gezi-rehberi-backend-9nmq.onrender.com"
 STRAPI_TOKEN = "e7e1fbc3ef414ab0992d663b4da0b8a01ddc34354213dd699df37ba92e1db0103bdacd0e43cae8420d4182a7427034d2a35017913675070e05f1d4d2cd012b67d33061e410745b1d825aef1f9eba935cdf49cf32820968ad69537fede31173706519bda42a11ea45d23c12bd6da68bb61c9c9484f9dc1d6c92674fc76fc303be" 
 
@@ -30,10 +29,9 @@ def fetch_travel_data():
     ]
 
 def enrich_and_translate_text(base_desc, place_name):
-    print(f"[2/5] '{place_name}' için metin YZ ile zenginleştiriliyor...")
+    print(f"[2/5] '{place_name}' için metin zenginleştiriliyor...")
     enriched_tr = f"{base_desc} Bu eşsiz mekan, her yıl milyonlarca yerli ve yabancı turisti ağırlamakta olup, şehrin kültürel dokusunu en iyi yansıtan noktalardan biridir."
     try:
-        # Türkçe'den İngilizce'ye çeviri işlemi
         enriched_en = GoogleTranslator(source='tr', target='en').translate(enriched_tr)
     except Exception as e:
         print(f" ⚠️ Çeviri uyarısı: {e}")
@@ -41,7 +39,7 @@ def enrich_and_translate_text(base_desc, place_name):
     return enriched_tr, enriched_en
 
 def generate_and_download_image(place_name):
-    print(f"[3/5] '{place_name}' için YZ görseli talep ediliyor...")
+    print(f"[3/5] '{place_name}' için görsel üretiliyor...")
     safe_prompt_name = place_name.replace('ı','i').replace('ğ','g').replace('ş','s').replace('ç','c').replace('ö','o').replace('ü','u')
     prompt = f"professional travel photography of {safe_prompt_name}, highly detailed, scenic, tourist destination"
     encoded_prompt = requests.utils.quote(prompt)
@@ -51,10 +49,10 @@ def generate_and_download_image(place_name):
     try:
         response = requests.get(pollinations_url, timeout=20)
         if response.status_code == 200 and len(response.content) > 1000:
-            print("  ✅ Görsel Ana YZ Servisinden başarıyla üretildi.")
+            print("  ✅ Görsel başarıyla üretildi.")
             return response.content
         else:
-            print(f"  ⚠️ Ana servis kısıtlamasına takılındı (Kod: {response.status_code}). Yedek seyahat havuzuna bağlanılıyor...")
+            print(f"  ⚠️ Ana servis kısıtlamasına takılındı (Kod: {response.status_code}). Yedek havuza bağlanılıyor...")
             backup_url = f"https://images.unsplash.com/photo-1524230572899-a752b3835840?q=80&w=1024&auto=format&fit=crop"
             if "ayasofya" in safe_prompt_name.lower():
                 backup_url = "https://images.unsplash.com/photo-1541432901042-2d8bd64b4a9b?q=80&w=1024&auto=format&fit=crop"
@@ -63,7 +61,7 @@ def generate_and_download_image(place_name):
                 
             backup_res = requests.get(backup_url, timeout=20)
             if backup_res.status_code == 200:
-                print("  ✅ Yedek seyahat görsel havuzundan dinamik fotoğraf başarıyla çekildi.")
+                print("  ✅ Yedek seyahat görsel havuzundan fotoğraf başarıyla çekildi.")
                 return backup_res.content
     except Exception as e:
         print(f"  ❌ Görsel indirme aşamasında genel ağ hatası: {e}")
@@ -93,7 +91,6 @@ def save_data_to_strapi(city_data, tr_desc, en_desc, media_id):
     print("[5/5] Veriler ve ilişkiler Strapi veritabanına yazılıyor...")
     
     try:
-        # 1. Şehir Kontrolü / Oluşturulması
         city_check_res = requests.get(f"{STRAPI_URL}/api/cities?filters[Ad][$eq]={city_data['city_name']}", headers=HEADERS)
         city_check = city_check_res.json()
         
@@ -104,7 +101,6 @@ def save_data_to_strapi(city_data, tr_desc, en_desc, media_id):
             city_res = requests.post(f"{STRAPI_URL}/api/cities", headers=HEADERS, json=city_payload)
             city_id = city_res.json()['data']['id']
 
-        # 2. Mekan Kaydı (TR - Varsayılan Dil)
         place_payload_tr = {
             "data": {
                 "Mekan_Adi": city_data["place_name"],
@@ -120,7 +116,6 @@ def save_data_to_strapi(city_data, tr_desc, en_desc, media_id):
         if place_res_tr.status_code in [200, 201]:
             print(f"  ✅ '{city_data['place_name']}' (TR) veritabanına eklendi.")
             
-            # 3. Mekan Kaydı (EN - Strapi v5 Çok Dilli İlişkilendirme Standardı)
             place_payload_en = {
                 "data": {
                     "Mekan_Adi": city_data["place_name"],
@@ -131,7 +126,6 @@ def save_data_to_strapi(city_data, tr_desc, en_desc, media_id):
                     "locale": "en"
                 }
             }
-            # İngilizce içeriği de aynı koleksiyona 'en' locale bayrağıyla bağımsız olarak kaydediyoruz
             place_res_en = requests.post(f"{STRAPI_URL}/api/places", headers=HEADERS, json=place_payload_en)
             
             if place_res_en.status_code in [200, 201]:

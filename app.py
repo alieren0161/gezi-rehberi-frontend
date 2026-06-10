@@ -1,10 +1,8 @@
 import streamlit as st
 import requests
 
-# --- YAPILANDIRMA ---
 STRAPI_URL = "https://gezi-rehberi-backend-9nmq.onrender.com"
 
-# --- SAYFA AYARLARI ---
 st.set_page_config(
     page_title="🌍 Gezi Rehberi",
     page_icon="🗺️",
@@ -12,12 +10,10 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# --- ÖZEL CSS ---
 st.markdown("""
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:wght@700;800;900&display=swap');
     
-    /* ===== GENEL ===== */
     .stApp {
         font-family: 'Inter', sans-serif;
         background: #0a0a14;
@@ -25,8 +21,6 @@ st.markdown("""
     .block-container {
         padding-top: 2rem !important;
     }
-    
-    /* ===== HERO ===== */
     .hero-container {
         text-align: center;
         padding: 3rem 1rem 2rem;
@@ -79,8 +73,6 @@ st.markdown("""
         position: relative;
         z-index: 1;
     }
-    
-    /* ===== BÖLÜM BAŞLIKLARI ===== */
     .section-header {
         display: flex;
         align-items: center;
@@ -113,8 +105,6 @@ st.markdown("""
         border-radius: 50px;
         margin-left: auto;
     }
-    
-    /* ===== ŞEHİR BİLGİ KARTI ===== */
     .city-banner {
         background: linear-gradient(135deg, rgba(124,58,237,0.12) 0%, rgba(59,130,246,0.08) 100%);
         border: 1px solid rgba(124,58,237,0.18);
@@ -159,8 +149,6 @@ st.markdown("""
         line-height: 1.7;
         max-width: 600px;
     }
-    
-    /* ===== MEKAN KARTLARI ===== */
     .place-card {
         background: #111827;
         border: 1px solid rgba(255,255,255,0.06);
@@ -174,7 +162,6 @@ st.markdown("""
         transform: translateY(-6px);
         box-shadow: 0 25px 60px rgba(124,58,237,0.15), 0 0 0 1px rgba(124,58,237,0.2);
     }
-    
     .place-img-wrapper {
         position: relative;
         overflow: hidden;
@@ -196,7 +183,6 @@ st.markdown("""
         height: 100px;
         background: linear-gradient(transparent, #111827);
     }
-    
     .place-body {
         padding: 1.25rem 1.5rem 1.5rem;
     }
@@ -215,8 +201,6 @@ st.markdown("""
         flex: 1;
         margin-right: 0.75rem;
     }
-    
-    /* Puan Rozeti */
     .rating {
         display: inline-flex;
         align-items: center;
@@ -230,7 +214,6 @@ st.markdown("""
         white-space: nowrap;
         box-shadow: 0 4px 12px rgba(251,191,36,0.3);
     }
-    
     .place-desc {
         font-size: 0.9rem;
         color: #94a3b8;
@@ -241,7 +224,6 @@ st.markdown("""
         -webkit-box-orient: vertical;
         overflow: hidden;
     }
-    
     .place-footer {
         display: flex;
         align-items: center;
@@ -279,8 +261,6 @@ st.markdown("""
         color: #60a5fa;
         border: 1px solid rgba(59,130,246,0.2);
     }
-    
-    /* ===== SIDEBAR ===== */
     section[data-testid="stSidebar"] {
         background: linear-gradient(180deg, #0d0d1a 0%, #0a0a14 100%) !important;
         border-right: 1px solid rgba(124,58,237,0.12) !important;
@@ -292,8 +272,6 @@ st.markdown("""
         letter-spacing: 1.5px !important;
         font-weight: 700 !important;
     }
-    
-    /* Sidebar Logo */
     .sidebar-logo {
         text-align: center;
         padding: 1rem 0 1.5rem;
@@ -310,8 +288,6 @@ st.markdown("""
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
     }
-    
-    /* Stat Cards */
     .stats-grid {
         display: grid;
         grid-template-columns: 1fr 1fr;
@@ -342,15 +318,11 @@ st.markdown("""
         text-transform: uppercase;
         letter-spacing: 1px;
     }
-    
-    /* ===== DİVİDER ===== */
     .divider {
         height: 1px;
         background: linear-gradient(90deg, transparent, rgba(124,58,237,0.25), transparent);
         margin: 1.75rem 0;
     }
-    
-    /* ===== BOŞ DURUM ===== */
     .empty-state {
         text-align: center;
         padding: 5rem 2rem;
@@ -371,8 +343,6 @@ st.markdown("""
         color: #334155;
         font-size: 0.95rem;
     }
-    
-    /* ===== FOOTER ===== */
     .app-footer {
         text-align: center;
         padding: 2.5rem 1rem;
@@ -398,15 +368,11 @@ st.markdown("""
     .footer-link:hover {
         color: #a78bfa;
     }
-    
-    /* ===== RESPONSIVE ===== */
     @media (max-width: 768px) {
         .hero-title { font-size: 2.2rem; }
         .city-banner { padding: 1.25rem; }
         .city-banner-name { font-size: 1.5rem; }
     }
-    
-    /* Streamlit element overrides */
     div[data-testid="stImage"] {
         border-radius: 16px 16px 0 0;
         overflow: hidden;
@@ -418,7 +384,6 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 
-# --- VERİ ÇEKME ---
 @st.cache_data(ttl=300)
 def get_cities():
     try:
@@ -443,7 +408,6 @@ def get_places(city_id=None):
     return []
 
 
-# --- YARDIMCI ---
 def get_image_url(place):
     try:
         kapak = place.get("Kapak_Resmi")
@@ -472,19 +436,16 @@ def extract_text(field):
     return ""
 
 def get_city_name_for_place(place, cities):
-    """Mekanın bağlı olduğu şehri bulur."""
     city_data = place.get("city")
     if city_data:
         return city_data.get("Ad", "")
     return ""
 
 
-# --- ANA UYGULAMA ---
 def main():
     cities = get_cities()
     all_places = get_places()
     
-    # ===== SIDEBAR =====
     with st.sidebar:
         st.markdown("""
         <div class="sidebar-logo">
@@ -495,7 +456,6 @@ def main():
         
         st.markdown('<div class="divider"></div>', unsafe_allow_html=True)
         
-        # Dil Seçimi
         st.markdown("### 🌐 Dil")
         lang = st.radio(
             "Dil seçin",
@@ -508,7 +468,6 @@ def main():
         
         st.markdown('<div class="divider"></div>', unsafe_allow_html=True)
         
-        # Şehir Filtresi
         st.markdown("### 🏙️ " + ("Şehir Filtresi" if is_turkish else "City Filter"))
         
         all_label = "Tüm Şehirler" if is_turkish else "All Cities"
@@ -529,7 +488,6 @@ def main():
         
         st.markdown('<div class="divider"></div>', unsafe_allow_html=True)
         
-        # İstatistikler
         st.markdown("### 📊 " + ("İstatistikler" if is_turkish else "Statistics"))
         st.markdown(f"""
         <div class="stats-grid">
@@ -557,23 +515,18 @@ def main():
         </div>
         """, unsafe_allow_html=True)
     
-    # ===== ANA İÇERİK =====
-    
-    # Hero
     st.markdown(f"""
     <div class="hero-container">
-        <div class="hero-badge">✨ {"YZ Destekli • Çok Dilli • Dinamik" if is_turkish else "AI-Powered • Multi-Language • Dynamic"}</div>
+        <div class="hero-badge">✨ {"Çok Dilli • Dinamik • İnteraktif" if is_turkish else "Multi-Language • Dynamic • Interactive"}</div>
         <h1 class="hero-title">{"Gezi Rehberi" if is_turkish else "Travel Guide"}</h1>
         <p class="hero-subtitle">{"Dünyanın en güzel şehirlerini ve mekanlarını keşfedin" if is_turkish else "Discover the most beautiful cities and places around the world"}</p>
     </div>
     """, unsafe_allow_html=True)
     
-    # Filtreleme
     selected_city_id = None
     if selected and selected not in ["Tüm Şehirler", "All Cities"]:
         selected_city_id = city_map.get(selected)
     
-    # Seçili Şehir Bannerı
     if selected_city_id:
         for c in cities:
             cid = c.get("id") if "id" in c else c.get("documentId")
@@ -588,10 +541,8 @@ def main():
                 """, unsafe_allow_html=True)
                 break
     
-    # Mekanları getir
     places = get_places(selected_city_id) if selected_city_id else all_places
     
-    # Bölüm Başlığı
     place_count = len(places)
     st.markdown(f"""
     <div class="section-header">
@@ -601,7 +552,6 @@ def main():
     </div>
     """, unsafe_allow_html=True)
     
-    # Mekan Kartları
     if not places:
         st.markdown(f"""
         <div class="empty-state">
@@ -620,11 +570,9 @@ def main():
                 puan = place.get("Puan", 0)
                 city_name = get_city_name_for_place(place, cities)
                 
-                # Görsel
                 if img_url:
                     st.image(img_url, width="stretch")
                 
-                # Kart İçeriği
                 st.markdown(f"""
                 <div class="place-body">
                     <div class="place-top-row">
@@ -644,12 +592,11 @@ def main():
                 
                 st.markdown("")
     
-    # Footer
     st.markdown(f"""
     <div class="app-footer">
         <div class="footer-brand">🌍 {"Gezi Rehberi Sistemi" if is_turkish else "Travel Guide System"}</div>
         <div class="footer-sub">
-            {"YZ Destekli, Çok Dilli ve Dinamik Gezi Rehberi" if is_turkish else "AI-Powered, Multi-Language and Dynamic Travel Guide"}
+            {"Çok Dilli ve Dinamik Gezi Rehberi" if is_turkish else "Multi-Language and Dynamic Travel Guide"}
             <br>
             BIP210 İçerik Yönetimi — Final Projesi
             <br>
