@@ -10,7 +10,7 @@ HEADERS = {
 }
 
 def fetch_travel_data():
-    print("[1/5] Gezi verileri havuzdan çekiliyor...")
+    print("[1/5] Gezi verileri alınıyor...")
     return [
         {
             "city_name": "Istanbul",
@@ -29,17 +29,17 @@ def fetch_travel_data():
     ]
 
 def enrich_and_translate_text(base_desc, place_name):
-    print(f"[2/5] '{place_name}' için metin zenginleştiriliyor...")
+    print(f"[2/5] '{place_name}' için metin hazırlanıyor...")
     enriched_tr = f"{base_desc} Bu eşsiz mekan, her yıl milyonlarca yerli ve yabancı turisti ağırlamakta olup, şehrin kültürel dokusunu en iyi yansıtan noktalardan biridir."
     try:
         enriched_en = GoogleTranslator(source='tr', target='en').translate(enriched_tr)
     except Exception as e:
-        print(f" ⚠️ Çeviri uyarısı: {e}")
+        print(f"  Çeviri hatası: {e}")
         enriched_en = "A wonderful place to visit with rich history and cultural importance."
     return enriched_tr, enriched_en
 
 def generate_and_download_image(place_name):
-    print(f"[3/5] '{place_name}' için görsel üretiliyor...")
+    print(f"[3/5] '{place_name}' için görsel indiriliyor...")
     safe_prompt_name = place_name.replace('ı','i').replace('ğ','g').replace('ş','s').replace('ç','c').replace('ö','o').replace('ü','u')
     prompt = f"professional travel photography of {safe_prompt_name}, highly detailed, scenic, tourist destination"
     encoded_prompt = requests.utils.quote(prompt)
@@ -49,10 +49,10 @@ def generate_and_download_image(place_name):
     try:
         response = requests.get(pollinations_url, timeout=20)
         if response.status_code == 200 and len(response.content) > 1000:
-            print("  ✅ Görsel başarıyla üretildi.")
+            print("  Görsel başarıyla indirildi.")
             return response.content
         else:
-            print(f"  ⚠️ Ana servis kısıtlamasına takılındı (Kod: {response.status_code}). Yedek havuza bağlanılıyor...")
+            print(f"  Ana servis yanıtlamadı (Kod: {response.status_code}). Yedek kaynağa bağlanılıyor...")
             backup_url = f"https://images.unsplash.com/photo-1524230572899-a752b3835840?q=80&w=1024&auto=format&fit=crop"
             if "ayasofya" in safe_prompt_name.lower():
                 backup_url = "https://images.unsplash.com/photo-1541432901042-2d8bd64b4a9b?q=80&w=1024&auto=format&fit=crop"
@@ -61,14 +61,14 @@ def generate_and_download_image(place_name):
                 
             backup_res = requests.get(backup_url, timeout=20)
             if backup_res.status_code == 200:
-                print("  ✅ Yedek seyahat görsel havuzundan fotoğraf başarıyla çekildi.")
+                print("  Yedek kaynaktan görsel alındı.")
                 return backup_res.content
     except Exception as e:
-        print(f"  ❌ Görsel indirme aşamasında genel ağ hatası: {e}")
+        print(f"  Görsel indirme hatası: {e}")
     return None
 
 def upload_image_to_strapi(img_content, file_name):
-    print(f"[4/5] '{file_name}' Strapi Media Library'ye yükleniyor...")
+    print(f"[4/5] '{file_name}' Strapi'ye yükleniyor...")
     upload_url = f"{STRAPI_URL}/api/upload"
     
     files = {
@@ -79,16 +79,16 @@ def upload_image_to_strapi(img_content, file_name):
         res = requests.post(upload_url, headers=HEADERS, files=files, timeout=30)
         if res.status_code in [200, 201]:
             media_id = res.json()[0]['id']
-            print(f"  ✅ Görsel Strapi'ye başarıyla yüklendi! Medya ID: {media_id}")
+            print(f"  Görsel yüklendi. Medya ID: {media_id}")
             return media_id
         else:
-            print(f"  ❌ Strapi Upload API Hatası! Durum: {res.status_code}")
+            print(f"  Yükleme hatası. Durum kodu: {res.status_code}")
     except Exception as e:
-        print(f"  ❌ Strapi'ye yükleme sırasında bağlantı koptu: {e}")
+        print(f"  Bağlantı hatası: {e}")
     return None
 
 def save_data_to_strapi(city_data, tr_desc, en_desc, media_id):
-    print("[5/5] Veriler ve ilişkiler Strapi veritabanına yazılıyor...")
+    print("[5/5] Veriler veritabanına kaydediliyor...")
     
     try:
         city_check_res = requests.get(f"{STRAPI_URL}/api/cities?filters[Ad][$eq]={city_data['city_name']}", headers=HEADERS)
@@ -114,7 +114,7 @@ def save_data_to_strapi(city_data, tr_desc, en_desc, media_id):
         place_res_tr = requests.post(f"{STRAPI_URL}/api/places", headers=HEADERS, json=place_payload_tr)
         
         if place_res_tr.status_code in [200, 201]:
-            print(f"  ✅ '{city_data['place_name']}' (TR) veritabanına eklendi.")
+            print(f"  '{city_data['place_name']}' (TR) kaydedildi.")
             
             place_payload_en = {
                 "data": {
@@ -129,21 +129,20 @@ def save_data_to_strapi(city_data, tr_desc, en_desc, media_id):
             place_res_en = requests.post(f"{STRAPI_URL}/api/places", headers=HEADERS, json=place_payload_en)
             
             if place_res_en.status_code in [200, 201]:
-                print(f"  ✅ '{city_data['place_name']}' (EN) lokalizasyonu başarıyla bağlandı.")
+                print(f"  '{city_data['place_name']}' (EN) kaydedildi.")
             else:
-                print(f"  ❌ İngilizce dil paketi eklenemedi: {place_res_en.text}")
+                print(f"  EN kayıt hatası: {place_res_en.text}")
         else:
-            print(f"  ❌ Mekan veritabanına yazılamadı: {place_res_tr.text}")
+            print(f"  TR kayıt hatası: {place_res_tr.text}")
             
     except Exception as e:
-        print(f"  ❌ Strapi Veritabanı API hatası: {e}")
+        print(f"  Veritabanı hatası: {e}")
 
 def main():
-    print("=== ENTEGRASYON MOTORU TETİKLENDİ ===")
     raw_data = fetch_travel_data()
     
     for item in raw_data:
-        print(f"\n--- İşlem Grubu: {item['place_name']} ---")
+        print(f"\n--- {item['place_name']} ---")
         tr_desc, en_desc = enrich_and_translate_text(item["base_desc"], item["place_name"])
         img_content = generate_and_download_image(item["place_name"])
         
@@ -154,10 +153,10 @@ def main():
             if media_id:
                 save_data_to_strapi(item, tr_desc, en_desc, media_id)
         else:
-            print(" ❌ Görsel içeriği alınamadığı için geçildi.")
+            print("  Görsel alınamadı, atlanıyor.")
             
         time.sleep(2)
-    print("\n=== TÜM SÜREÇ TERTEMİZ TAMAMLANDI ===")
+    print("\nTamamlandı.")
 
 if __name__ == "__main__":
     main()
