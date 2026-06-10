@@ -504,16 +504,7 @@ def main():
         
         st.markdown('<div class="divider"></div>', unsafe_allow_html=True)
         
-        st.markdown("""
-        <div style="text-align:center;padding:1rem 0;">
-            <div style="font-size:0.7rem;color:#334155;text-transform:uppercase;letter-spacing:2px;font-weight:600;">
-                BIP210 • İçerik Yönetimi
-            </div>
-            <div style="font-size:0.65rem;color:#1e293b;margin-top:0.3rem;">
-                Final Projesi — 2026
-            </div>
-        </div>
-        """, unsafe_allow_html=True)
+
     
     st.markdown(f"""
     <div class="hero-container">
@@ -592,18 +583,7 @@ def main():
                 
                 st.markdown("")
     
-    st.markdown(f"""
-    <div class="app-footer">
-        <div class="footer-brand">🌍 {"Gezi Rehberi Sistemi" if is_turkish else "Travel Guide System"}</div>
-        <div class="footer-sub">
-            {"Çok Dilli ve Dinamik Gezi Rehberi" if is_turkish else "Multi-Language and Dynamic Travel Guide"}
-            <br>
-            BIP210 İçerik Yönetimi — Final Projesi
-            <br>
-            <a href="{STRAPI_URL}/admin" target="_blank" class="footer-link">Strapi Admin Panel</a>
-        </div>
-    </div>
-    """, unsafe_allow_html=True)
+
 
 
 if __name__ == "__main__":
